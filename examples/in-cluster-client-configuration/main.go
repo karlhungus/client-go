@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -46,6 +47,30 @@ func main() {
 		}
 		fmt.Printf("There this deployment is, %v\n", deployment)
 		fmt.Printf("there are %d replicas", *deployment.Spec.Replicas)
+
+		fmt.Printf("create a secret!")
+
+		secret, err := clientset.CoreV1().Secrets("default").Get("demo-secret", metav1.GetOptions{}) //	("default").List(metav1.ListOptions{})
+		if err != nil {
+			fmt.Printf("Didn't find secret, creating")
+			sec := &apiv1.Secret{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "demo-secret",
+				},
+			}
+
+			newSecret, err := clientset.CoreV1().Secrets("default").Create(sec)
+			if err != nil {
+				panic(err.Error())
+			}
+			fmt.Printf("Created Secret: %s", newSecret)
+		} else {
+			fmt.Printf("found secrete: %s, destroying", secret)
+			err2 := clientset.CoreV1().Secrets("default").Delete("demo-secret", &metav1.DeleteOptions{})
+			if err2 != nil {
+				fmt.Printf("failed to delete: %s", err2)
+			}
+		}
 
 		pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
 		if err != nil {
