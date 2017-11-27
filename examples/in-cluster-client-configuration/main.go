@@ -33,12 +33,20 @@ func main() {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
 	for {
+		deployment, err := clientset.ExtensionsV1beta1().Deployments("default").Get("demo", metav1.GetOptions{})
+		if err != nil {
+			panic(err.Error())
+		}
+		fmt.Printf("There this deployment is, %v\n", deployment)
+		fmt.Printf("there are %d replicas", *deployment.Spec.Replicas)
+
 		pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
 		if err != nil {
 			panic(err.Error())
