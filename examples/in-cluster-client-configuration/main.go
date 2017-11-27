@@ -46,29 +46,30 @@ func main() {
 			panic(err.Error())
 		}
 		fmt.Printf("There this deployment is, %v\n", deployment)
-		fmt.Printf("there are %d replicas", *deployment.Spec.Replicas)
+		fmt.Printf("there are %d replicas\n", *deployment.Spec.Replicas)
 
-		fmt.Printf("create a secret!")
+		fmt.Printf("create a secret!\n")
 
 		secret, err := clientset.CoreV1().Secrets("default").Get("demo-secret", metav1.GetOptions{}) //	("default").List(metav1.ListOptions{})
 		if err != nil {
-			fmt.Printf("Didn't find secret, creating")
+			fmt.Printf("Didn't find secret, creating\n")
 			sec := &apiv1.Secret{
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "demo-secret",
 				},
+				StringData: map[string]string{"foo": "bar"},
 			}
 
 			newSecret, err := clientset.CoreV1().Secrets("default").Create(sec)
 			if err != nil {
 				panic(err.Error())
 			}
-			fmt.Printf("Created Secret: %s", newSecret)
+			fmt.Printf("Created Secret: %s\n", newSecret)
 		} else {
-			fmt.Printf("found secrete: %s, destroying", secret)
+			fmt.Printf("found secrete: %s, destroying\n", secret)
 			err2 := clientset.CoreV1().Secrets("default").Delete("demo-secret", &metav1.DeleteOptions{})
 			if err2 != nil {
-				fmt.Printf("failed to delete: %s", err2)
+				fmt.Printf("failed to delete: %s\n", err2)
 			}
 		}
 
